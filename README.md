@@ -1,4 +1,4 @@
-# RasaKopi.ai
+# SentimenKopi.com
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -6,7 +6,7 @@
 
 ## Overview
 
-RasaKopi.ai is a full-stack web application designed to help coffee shop owners in Indonesia unlock valuable insights from customer reviews. By simply uploading a CSV file of raw feedback, users can leverage a sophisticated MLOps pipeline that performs sentiment analysis, generates concise summaries, and provides actionable business suggestions. This tool transforms qualitative customer feedback into a quantitative asset, enabling data-driven decisions to improve service, products, and overall customer experience.
+SentimenKopi.com is a full-stack web application designed to help coffee shop owners in Indonesia unlock valuable insights from customer reviews. By simply uploading a CSV file of raw feedback, users can leverage a sophisticated MLOps pipeline that performs sentiment analysis, generates concise summaries, and provides actionable business suggestions. This tool transforms qualitative customer feedback into a quantitative asset, enabling data-driven decisions to improve service, products, and overall customer experience.
 
 ## Key Features
 
@@ -72,8 +72,8 @@ Follow these steps to set up and run the project locally:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/RasaKopi.ai.git
-    cd RasaKopi.ai
+    git clone https://github.com/your-username/SentimenKopi.com.git
+    cd SentimenKopi.com
     ```
 
 2.  **Create and activate a Conda virtual environment:**
