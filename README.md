@@ -1,4 +1,4 @@
-# RasaKopi.ai ☕
+# SentimenKopi.com ☕
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -6,7 +6,7 @@
 
 ## 📖 Overview
 
-RasaKopi.ai is a full-stack web application designed to provide powerful sentiment analysis for Indonesian coffee shop reviews. In a competitive market, understanding customer feedback is crucial. This tool empowers coffee shop owners to move beyond manual review analysis by offering an automated MLOps pipeline. Users can upload a CSV file of raw customer reviews and receive not only a detailed sentiment breakdown (positive, negative, neutral) but also AI-generated summaries and actionable business suggestions to improve their service and offerings.
+SentimenKopi.com is a full-stack web application designed to provide powerful sentiment analysis for Indonesian coffee shop reviews. In a competitive market, understanding customer feedback is crucial. This tool empowers coffee shop owners to move beyond manual review analysis by offering an automated MLOps pipeline. Users can upload a CSV file of raw customer reviews and receive not only a detailed sentiment breakdown (positive, negative, neutral) but also AI-generated summaries and actionable business suggestions to improve their service and offerings.
 
 ## ✨ Key Features
 
