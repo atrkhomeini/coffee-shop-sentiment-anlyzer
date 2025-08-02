@@ -7,3 +7,4 @@ scikit-learn
 google-cloud-bigquery
 google-generativeai
 db-dtypes
+Jinja2
