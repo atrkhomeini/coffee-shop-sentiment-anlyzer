@@ -74,15 +74,15 @@ rasakopi-ai/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/atrkhomeini/Sentiment-Analysis-of-4-Brand-Coffee-Shop-in-Indonesia-Using-CNN-BiLSTM.git
-cd Sentiment-Analysis-of-4-Brand-Coffee-Shop-in-Indonesia-Using-CNN-BiLSTM
+git clone https://github.com/atrkhomeini/coffee-shop-sentiment-anlyzer.git
+cd coffee-shop-sentiment-anlyzer
 ```
 
-### 2. Create and Activate a Conda Environment
+### 2. Create and Activate a Conda Environment (If you use Conda)
 
 ```bash
-conda create --name rasakopi python=3.10
-conda activate rasakopi
+conda create --name sentimenkopi python=3.10
+conda activate sentimenkopi
 ```
 
 ### 3. Install Dependencies
@@ -135,3 +135,4 @@ Navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 - Direct database connection for users instead of CSV uploads.
 - Automated CI/CD pipeline for model retraining and deployment.
 - Preview 10 data result in web
+- Visualize the proportion of the result sentiment analyze with pie chart or bar chart
