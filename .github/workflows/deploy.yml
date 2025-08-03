@@ -9,7 +9,6 @@ on:
 env:
   PROJECT_ID: coffee-shop-467807
   REGION: asia-southeast2
-  # --- UPDATED: Use the correct service and repo names ---
   SERVICE_NAME: sentimenkopi-com-prod
   REPO_NAME: sentimenkopi-repo
 
@@ -50,5 +49,9 @@ jobs:
         service: ${{ env.SERVICE_NAME }}
         region: ${{ env.REGION }}
         image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:latest
+        # --- UPDATED: Add necessary deployment flags ---
+        port: '8000'
+        memory: '2Gi'
+        allow_unauthenticated: true
         env_vars: |
           GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
