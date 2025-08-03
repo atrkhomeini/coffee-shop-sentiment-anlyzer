@@ -9,8 +9,8 @@ on:
 env:
   PROJECT_ID: coffee-shop-467807
   REGION: asia-southeast2
-  SERVICE_NAME: rasakopi-ai-prod
-  REPO_NAME: rasakopi-repo
+  SERVICE_NAME: sentimenkopi-com-prod
+  REPO_NAME: sentimenkopi-repo
 
 jobs:
   build-and-deploy:
