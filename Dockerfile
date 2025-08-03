@@ -16,12 +16,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./app /app/app
 COPY ./src /app/src
 COPY ./models /app/models
-# Copy the Gemini API key file into the container
-COPY key/gemini_api_key.yml /app/key/gemini_api_key.yml
+
+# NOTE: We DO NOT copy the key/gemini_api_key.yml file.
+# The API key will be injected as an environment variable during deployment.
+# This makes the image secure and portable.
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
 # Command to run the application
-# Use 0.0.0.0 to make it accessible from outside the container
+# The src/config.py file will automatically pick up the GEMINI_API_KEY env variable.
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
