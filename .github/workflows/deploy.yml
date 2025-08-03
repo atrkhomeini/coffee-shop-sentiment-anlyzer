@@ -49,9 +49,10 @@ jobs:
         service: ${{ env.SERVICE_NAME }}
         region: ${{ env.REGION }}
         image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:latest
-        # --- UPDATED: Add necessary deployment flags ---
-        port: '8000'
-        memory: '2Gi'
-        allow_unauthenticated: true
         env_vars: |
           GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+        # --- UPDATED: Use the 'flags' input for additional gcloud options ---
+        flags: >-
+          --port=8000
+          --memory=2Gi
+          --allow-unauthenticated
