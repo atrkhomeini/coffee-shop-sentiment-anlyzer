@@ -9,6 +9,7 @@ on:
 env:
   PROJECT_ID: coffee-shop-467807
   REGION: asia-southeast2
+  # --- UPDATED: Use the correct service and repo names ---
   SERVICE_NAME: sentimenkopi-com-prod
   REPO_NAME: sentimenkopi-repo
 
