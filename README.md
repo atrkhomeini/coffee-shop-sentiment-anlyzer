@@ -134,5 +134,6 @@ Navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 - Real-time analytics dashboard to visualize sentiment trends.
 - Direct database connection for users instead of CSV uploads.
 - Automated CI/CD pipeline for model retraining and deployment.
-- Preview 10 data result in web
-- Visualize the proportion of the result sentiment analyze with pie chart or bar chart
+- Preview 10 data result in web.
+- Visualize the proportion of the result sentiment analyze with pie chart or bar chart.
+- Wordcloud
