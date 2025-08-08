@@ -153,7 +153,7 @@
             resultsArea.classList.add('hidden');
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/process_and_suggest?text_column=${encodeURIComponent(textColumn)}`, {
+                const response = await fetch(`/process_and_suggest?text_column=${encodeURIComponent(textColumn)}`, {
                     method: 'POST',
                     body: formData,
                 });
