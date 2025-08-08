@@ -8,16 +8,16 @@ def load_api_key():
     Prioritizes the environment variable for production/CI/CD environments.
     Falls back to the local YAML file for local development.
     """
-    # 1. Check for the environment variable first (used by Docker/Cloud Run)
     api_key = os.getenv("GEMINI_API_KEY")
     if api_key:
         print("✅ Loaded API key from environment variable.")
         return api_key
     
-    # 2. If no environment variable, fall back to the local file
     print("Trying to load API key from local file...")
     try:
-        with open("key/gemini_api_key.yml", "r") as f:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        key_path = os.path.join(base_dir, "key", "gemini_api_key.yml")
+        with open(key_path, "r") as f:
             config = yaml.safe_load(f)
             print("✅ Loaded API key from local key/gemini_api_key.yml file.")
             return config['gemini_api_key']
@@ -31,7 +31,8 @@ BIGQUERY_DATASET = "coffee_shop_sentiment"
 BIGQUERY_TRAINING_TABLE = "labelled" 
 
 # --- Model & Tokenizer Paths ---
-MODEL_PATH = "models/sentiment_model.h5"
+# --- UPDATED: Changed model filename to the modern .keras format ---
+MODEL_PATH = "models/sentiment_model.keras"
 TOKENIZER_PATH = "models/tokenizer.pkl"
 
 # --- Model Parameters ---
