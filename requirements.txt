@@ -8,4 +8,4 @@ google-cloud-bigquery
 google-generativeai
 db-dtypes
 Jinja2
-worldcloud
+wordcloud
