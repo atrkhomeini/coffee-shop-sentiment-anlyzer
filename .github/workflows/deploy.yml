@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
-      id-token: 'write' # Required for Workload Identity Federation
+      id-token: 'write'
 
     steps:
     - name: Checkout code
@@ -37,21 +37,22 @@ jobs:
     - name: Configure Docker
       run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
+    # --- UPDATED: Tag with the unique Git commit SHA instead of 'latest' ---
     - name: Build Docker image
-      run: docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:latest .
+      run: docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
 
     - name: Push Docker image
-      run: docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:latest
+      run: docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
 
     - name: Deploy to Cloud Run
       uses: google-github-actions/deploy-cloudrun@v1
       with:
         service: ${{ env.SERVICE_NAME }}
         region: ${{ env.REGION }}
-        image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:latest
+        # --- UPDATED: Deploy the new, uniquely tagged image ---
+        image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
         env_vars: |
           GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-        # --- UPDATED: Use the 'flags' input for additional gcloud options ---
         flags: >-
           --port=8000
           --memory=2Gi
