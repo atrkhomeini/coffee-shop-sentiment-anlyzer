@@ -5,87 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SentimenKopi.com - Sentiment Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js Library -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .spinner { border-top-color: #4f46e5; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .prose h3 { font-size: 1.1em; font-weight: 600; }
-        .prose ul { list-style-position: inside; padding-left: 0.5rem; }
-        .prose li { margin-bottom: 0.5rem; }
-        .table-cell { @apply px-4 py-2 border-b border-gray-200 text-sm; }
+        /* Custom color variables for your palette */
+        :root {
+            --rich-black: #101820;
+            --vivid-yellow: #FEE715;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--rich-black);
+        }
+        .spinner { 
+            border-top-color: var(--vivid-yellow); 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
+        
+        /* Custom styles for a modern look */
+        .main-container {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .yellow-glow {
+            text-shadow: 0 0 8px rgba(254, 231, 21, 0.7);
+        }
+        .form-input {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f0f0f0;
+        }
+        .form-input::placeholder {
+            color: #a0a0a0;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--vivid-yellow);
+            box-shadow: 0 0 0 2px var(--vivid-yellow);
+        }
+        .results-card {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex items-center justify-center min-h-screen py-12">
+<body class="text-gray-200 flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-5xl mx-auto p-4 md:p-8">
-        <div class="bg-white rounded-2xl shadow-lg p-8">
-            <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-gray-900">SentimenKopi.com</h1>
-                <p class="text-gray-600 mt-2">Analisis Sentimen untuk Ulasan Kedai Kopi Anda</p>
-            </div>
+    <div class="w-full max-w-4xl mx-auto">
+        <div class="bg-transparent rounded-2xl main-container p-8">
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Left Column: Form -->
+                <div>
+                    <div class="text-left mb-8">
+                        <h1 class="text-4xl font-extrabold text-white">SentimenKopi.com</h1>
+                        <p class="text-gray-400 mt-2">Analisis Ulasan Kedai Kopi Anda dengan AI</p>
+                    </div>
 
-            <!-- Upload Form -->
-            <div class="max-w-xl mx-auto">
-                <form id="upload-form" class="space-y-6">
-                    <div>
-                        <label for="file-upload" class="block text-sm font-medium text-gray-700 mb-2">Langkah 1: Unggah File CSV Anda</label>
-                        <div id="file-drop-area" class="flex justify-center items-center w-full px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                            <div class="space-y-1 text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                                <div class="flex text-sm text-gray-600"><label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500"><span>Pilih file</span><input id="file-upload" name="file" type="file" class="sr-only" accept=".csv"></label><p class="pl-1">atau seret dan lepas</p></div>
-                                <p id="file-name" class="text-xs text-gray-500">CSV hingga 10MB</p>
+                    <!-- Upload Form -->
+                    <form id="upload-form" class="space-y-6">
+                        <div>
+                            <label for="file-upload" class="block text-sm font-medium text-gray-300 mb-2">Langkah 1: Unggah File CSV</label>
+                            <div id="file-drop-area" class="flex justify-center items-center w-full px-6 py-10 border-2 border-dashed border-gray-600 rounded-md hover:border-vivid-yellow transition-colors duration-300">
+                                <div class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                    <div class="flex text-sm text-gray-400"><label for="file-upload" class="relative cursor-pointer rounded-md font-medium text-vivid-yellow hover:text-yellow-300"><span>Pilih file</span><input id="file-upload" name="file" type="file" class="sr-only" accept=".csv"></label><p class="pl-1">atau seret dan lepas</p></div>
+                                    <p id="file-name" class="text-xs text-gray-500">CSV hingga 10MB</p>
+                                </div>
                             </div>
                         </div>
+                        <div>
+                            <label for="text-column" class="block text-sm font-medium text-gray-300">Langkah 2: Nama Kolom Teks</label>
+                            <input type="text" id="text-column" class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm form-input" placeholder="Contoh: Text, review, ulasan">
+                        </div>
+                        <button type="submit" id="submit-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-rich-black bg-vivid-yellow hover:bg-yellow-300 disabled:bg-yellow-700 transition-colors duration-300">
+                            <span id="button-text">Analisis & Beri Wawasan</span>
+                            <div id="spinner" class="spinner h-5 w-5 rounded-full border-2 border-t-2 border-rich-black hidden"></div>
+                        </button>
+                    </form>
+                    <div id="error-message" class="mt-4 text-center text-sm text-red-400 font-medium hidden"></div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div id="results-area" class="mt-10 md:mt-0 hidden">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-white yellow-glow">✨ Wawasan Berbasis AI</h2>
+                        <p class="text-gray-400">Ringkasan dan saran oleh Gemini.</p>
                     </div>
-                    <div>
-                        <label for="text-column" class="block text-sm font-medium text-gray-700">Langkah 2: Masukkan Nama Kolom Teks</label>
-                        <input type="text" name="text_column" id="text-column" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" placeholder="Contoh: Text, review, ulasan">
+                    <div class="space-y-6">
+                        <div class="p-6 rounded-lg results-card"><h3 class="text-lg font-semibold text-vivid-yellow mb-3">Ringkasan Ulasan</h3><div id="summary-content" class="text-gray-300 text-sm"></div></div>
+                        <div class="p-6 rounded-lg results-card"><h3 class="text-lg font-semibold text-vivid-yellow mb-3">Saran Perbaikan</h3><div id="suggestions-content" class="text-gray-300 text-sm"></div></div>
                     </div>
-                    <button type="submit" id="submit-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400">
-                        <span id="button-text">Analisis & Beri Wawasan</span>
-                        <div id="spinner" class="spinner h-5 w-5 rounded-full border-2 border-t-2 border-gray-200 hidden"></div>
-                    </button>
-                </form>
-                <div id="error-message" class="mt-4 text-center text-sm text-red-600 font-medium hidden"></div>
-            </div>
-
-            <!-- Results Section -->
-            <div id="results-area" class="mt-12 hidden">
-                <!-- Data Preview -->
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800">📋 Pratinjau Hasil</h2>
-                    <p class="text-gray-600">Menampilkan 10 baris pertama dari data yang telah dianalisis.</p>
-                </div>
-                <div class="overflow-x-auto bg-gray-50 p-4 rounded-lg mb-12">
-                    <table class="min-w-full bg-white rounded-md">
-                        <thead id="preview-table-head"></thead>
-                        <tbody id="preview-table-body"></tbody>
-                    </table>
-                </div>
-
-                <!-- Visualizations -->
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800">📊 Visualisasi Data</h2>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-12">
-                    <div class="lg:col-span-2 bg-gray-50 p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-900 mb-3">Proporsi Sentimen</h3><canvas id="sentiment-chart"></canvas></div>
-                    <div class="lg:col-span-3 bg-gray-50 p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-900 mb-3">Word Cloud</h3><img id="wordcloud-image" class="w-full h-auto rounded" alt="Word Cloud of Reviews"></div>
-                </div>
-
-                <!-- Gemini Insights -->
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800">✨ Wawasan Berbasis AI</h2>
-                    <p class="text-gray-600">Ringkasan dan saran yang dihasilkan oleh Gemini.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                    <div class="bg-gray-50 p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-900 mb-3">Ringkasan Ulasan</h3><div id="summary-content" class="prose prose-sm text-gray-700"></div></div>
-                    <div class="bg-gray-50 p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-900 mb-3">Saran Perbaikan</h3><div id="suggestions-content" class="prose prose-sm text-gray-700"></div></div>
-                </div>
-
-                <div class="text-center mt-8">
-                    <button id="download-button" class="py-2 px-5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">Unduh CSV Hasil Lengkap</button>
+                     <div class="text-center mt-8">
+                        <button id="download-button" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">Unduh CSV Hasil Analisis</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,193 +110,112 @@
     </div>
 
     <script>
-        const form = document.getElementById('upload-form');
-        const submitButton = document.getElementById('submit-button');
-        const buttonText = document.getElementById('button-text');
-        const spinner = document.getElementById('spinner');
-        const errorMessage = document.getElementById('error-message');
-        const fileUpload = document.getElementById('file-upload');
-        const fileDropArea = document.getElementById('file-drop-area');
-        const fileNameDisplay = document.getElementById('file-name');
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('upload-form');
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = document.getElementById('button-text');
+            const spinner = document.getElementById('spinner');
+            const errorMessage = document.getElementById('error-message');
+            const fileUpload = document.getElementById('file-upload');
+            const fileDropArea = document.getElementById('file-drop-area');
+            const fileNameDisplay = document.getElementById('file-name');
 
-        const resultsArea = document.getElementById('results-area');
-        const summaryContent = document.getElementById('summary-content');
-        const suggestionsContent = document.getElementById('suggestions-content');
-        const downloadButton = document.getElementById('download-button');
-        
-        const previewTableHead = document.getElementById('preview-table-head');
-        const previewTableBody = document.getElementById('preview-table-body');
-        const wordcloudImage = document.getElementById('wordcloud-image');
-        const chartCanvas = document.getElementById('sentiment-chart');
-        let sentimentChart = null;
-
-        let csvResultData = null;
-
-        // Drag and Drop
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            fileDropArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
-        });
-        ['dragenter', 'dragover'].forEach(eventName => {
-            fileDropArea.addEventListener(eventName, () => fileDropArea.classList.add('border-indigo-600'));
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            fileDropArea.addEventListener(eventName, () => fileDropArea.classList.remove('border-indigo-600'));
-        });
-        fileDropArea.addEventListener('drop', e => {
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileUpload.files = files;
-                fileNameDisplay.textContent = files[0].name;
-            }
-        });
-        fileUpload.addEventListener('change', () => {
-             if (fileUpload.files.length > 0) fileNameDisplay.textContent = fileUpload.files[0].name;
-        });
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData();
-            const file = fileUpload.files[0];
-            const textColumn = document.getElementById('text-column').value;
-
-            if (!file || !textColumn) {
-                showError('Silakan unggah file dan tentukan nama kolom teks.');
-                return;
-            }
-            formData.append('file', file);
+            const resultsArea = document.getElementById('results-area');
+            const summaryContent = document.getElementById('summary-content');
+            const suggestionsContent = document.getElementById('suggestions-content');
+            const downloadButton = document.getElementById('download-button');
             
-            setLoading(true);
-            hideError();
-            resultsArea.classList.add('hidden');
+            let csvResultData = null;
 
-            try {
-                const response = await fetch(`/process_and_suggest?text_column=${encodeURIComponent(textColumn)}`, {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Terjadi kesalahan pada server.');
+            // Drag and Drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileDropArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
+            });
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileDropArea.addEventListener(eventName, () => fileDropArea.classList.add('border-yellow-400'));
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileDropArea.addEventListener(eventName, () => fileDropArea.classList.remove('border-yellow-400'));
+            });
+            fileDropArea.addEventListener('drop', e => {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileUpload.files = files;
+                    fileNameDisplay.textContent = files[0].name;
                 }
-
-                const results = await response.json();
-                displayResults(results);
-
-            } catch (error) {
-                showError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        });
-
-        function displayResults(results) {
-            // Gemini Insights
-            summaryContent.innerHTML = results.summary.replace(/\n/g, '<br>');
-            suggestionsContent.innerHTML = results.suggestions.replace(/\n/g, '<br>');
-
-            // Store CSV for download
-            csvResultData = results.csv_data;
-
-            // Word Cloud
-            if (results.wordcloud_image) {
-                wordcloudImage.src = `data:image/png;base64,${results.wordcloud_image}`;
-            }
-
-            // Data Preview Table
-            renderPreviewTable(results.preview_data);
-
-            // Sentiment Pie Chart
-            renderSentimentChart(results.sentiment_counts);
-            
-            resultsArea.classList.remove('hidden');
-        }
-
-        function renderPreviewTable(data) {
-            previewTableHead.innerHTML = '';
-            previewTableBody.innerHTML = '';
-            if (!data || data.length === 0) return;
-
-            const headers = Object.keys(data[0]);
-            const headerRow = document.createElement('tr');
-            headers.forEach(header => {
-                const th = document.createElement('th');
-                th.className = 'table-cell text-left font-semibold text-gray-600 bg-gray-100';
-                th.textContent = header;
-                headerRow.appendChild(th);
             });
-            previewTableHead.appendChild(headerRow);
-
-            data.forEach(row => {
-                const tr = document.createElement('tr');
-                headers.forEach(header => {
-                    const td = document.createElement('td');
-                    td.className = 'table-cell';
-                    td.textContent = row[header];
-                    tr.appendChild(td);
-                });
-                previewTableBody.appendChild(tr);
+            fileUpload.addEventListener('change', () => {
+                if (fileUpload.files.length > 0) fileNameDisplay.textContent = fileUpload.files[0].name;
             });
-        }
 
-        function renderSentimentChart(counts) {
-            if (sentimentChart) {
-                sentimentChart.destroy();
-            }
-            const labels = Object.keys(counts);
-            const data = Object.values(counts);
-            
-            sentimentChart = new Chart(chartCanvas, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Jumlah Sentimen',
-                        data: data,
-                        backgroundColor: [
-                            '#10B981', // Positive - Green
-                            '#F59E0B', // Neutral - kuning
-                            '#EF4444', // Negative - Red
-                        ],
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'top' }
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                const file = fileUpload.files[0];
+                const textColumn = document.getElementById('text-column').value;
+
+                if (!file || !textColumn) {
+                    showError('Silakan unggah file dan tentukan nama kolom teks.');
+                    return;
+                }
+                formData.append('file', file);
+                
+                setLoading(true);
+                hideError();
+                resultsArea.classList.add('hidden');
+
+                try {
+                    const response = await fetch(`http://127.0.0.1:8000/process_and_suggest?text_column=${encodeURIComponent(textColumn)}`, {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || 'Terjadi kesalahan pada server.');
                     }
+
+                    const results = await response.json();
+                    
+                    summaryContent.innerHTML = results.summary.replace(/\n/g, '<br>');
+                    suggestionsContent.innerHTML = results.suggestions.replace(/\n/g, '<br>');
+                    csvResultData = results.csv_data;
+                    resultsArea.classList.remove('hidden');
+
+                } catch (error) {
+                    showError(error.message);
+                } finally {
+                    setLoading(false);
                 }
             });
-        }
 
-        downloadButton.addEventListener('click', () => {
-            if (!csvResultData) return;
-            const blob = new Blob([csvResultData], { type: 'text/csv;charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const originalFilename = fileUpload.files[0].name.replace(/\.csv$/, '');
-            a.download = `${originalFilename}_sentimen.csv`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            downloadButton.addEventListener('click', () => {
+                if (!csvResultData) return;
+                const blob = new Blob([csvResultData], { type: 'text/csv;charset=utf-8;' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const originalFilename = fileUpload.files[0].name.replace(/\.csv$/, '');
+                a.download = `${originalFilename}_sentimen.csv`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            });
+
+            function setLoading(isLoading) {
+                submitButton.disabled = isLoading;
+                spinner.classList.toggle('hidden', !isLoading);
+                buttonText.classList.toggle('hidden', isLoading);
+            }
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('hidden');
+            }
+            function hideError() {
+                errorMessage.classList.add('hidden');
+            }
         });
-
-        function setLoading(isLoading) {
-            submitButton.disabled = isLoading;
-            spinner.classList.toggle('hidden', !isLoading);
-            buttonText.classList.toggle('hidden', isLoading);
-        }
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-        }
-        function hideError() {
-            errorMessage.classList.add('hidden');
-        }
     </script>
 </body>
 </html>
-
