@@ -1,27 +1,28 @@
 # src/gemini_client.py
 import google.generativeai as genai
-from src.config import GEMINI_API_KEY
+from src.config import GEMINI_API_KEY # This will be None if not found
 import time
 
 # --- Configure the Gemini API ---
-# This explicitly checks for the API key from your environment variable.
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY environment variable not set. Please set it before running the app.")
-    
-genai.configure(api_key=GEMINI_API_KEY)
-
-# --- Initialize the Generative Model ---
-model = genai.GenerativeModel('gemini-1.5-flash')
+# This configuration now only happens if the key was successfully loaded.
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-1.5-flash-latest')
+else:
+    model = None # Set model to None if no key is found
 
 def generate_insights(positive_reviews, negative_reviews):
     """
     Generates both a summary and actionable suggestions using the Gemini API.
     """
-    # Handle cases where there might be no reviews of a certain type
+    # --- ADDED: Check if the model was initialized ---
+    if not model:
+        error_msg = "Gemini API key not configured. Cannot generate insights."
+        return error_msg, error_msg
+
     if not positive_reviews and not negative_reviews:
         return "Tidak ada ulasan untuk dianalisis.", "Tidak ada ulasan negatif untuk memberikan saran."
 
-    # Create the prompt, ensuring we don't send empty lists
     prompt = f"""
     You are a business consultant for a coffee shop in Indonesia.
     Analyze the following customer reviews.
@@ -36,22 +37,18 @@ def generate_insights(positive_reviews, negative_reviews):
 
     **Section 1: Ringkasan Ulasan (Review Summary)**
     Summarize the main positive themes and the main negative themes in Bahasa Indonesia.
-    Format this as a short paragraph for positives and a short paragraph for negatives.
 
     **Section 2: Saran Perbaikan (Actionable Suggestions)**
-    Based ONLY on the negative reviews, provide 3-4 concrete, actionable suggestions for the business owner to improve.
-    If there are no negative reviews, state that.
-    Present these as a bulleted list in Bahasa Indonesia.
+    Based ONLY on the negative reviews, provide 3-4 concrete, actionable suggestions.
     """
 
-     # Using exponential backoff for retries
-    for n in range(5): # Retry up to 5 times
+    # Using exponential backoff for retries
+    for n in range(5):
         try:
             response = model.generate_content(prompt)
             
             full_text = response.text
-            summary_part = "Ringkasan tidak dapat dibuat."
-            suggestions_part = "Saran tidak dapat dibuat."
+            summary_part, suggestions_part = "Gagal mem-parsing respons.", "Gagal mem-parsing respons."
 
             if "Saran Perbaikan" in full_text:
                 parts = full_text.split("Saran Perbaikan")
@@ -61,11 +58,8 @@ def generate_insights(positive_reviews, negative_reviews):
                  summary_part = full_text.replace("Ringkasan Ulasan", "").strip()
 
             return summary_part, suggestions_part
-
         except Exception as e:
             print(f"Gemini API attempt {n+1} failed with error: {e}")
-            time.sleep(2 ** n) # Exponential backoff: 1s, 2s, 4s, 8s
+            time.sleep(2 ** n)
     
-    # If all retries fail
     return "Gagal menghasilkan ringkasan setelah beberapa kali percobaan.", "Gagal menghasilkan saran setelah beberapa kali percobaan."
-
