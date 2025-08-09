@@ -5,104 +5,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SentimenKopi.com - Sentiment Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js Library -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom color variables for your palette */
-        :root {
-            --rich-black: #101820;
-            --vivid-yellow: #FEE715;
-        }
+      :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 222.2 47.4% 11.2%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 222.2 84% 4.9%;
+        --radius: 0.5rem;
+      }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--rich-black);
-        }
-        .spinner { 
-            border-top-color: var(--vivid-yellow); 
-            animation: spin 1s linear infinite; 
-        }
-        @keyframes spin { 
-            to { transform: rotate(360deg); } 
-        }
-        
-        /* Custom styles for a modern look */
-        .main-container {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-        .yellow-glow {
-            text-shadow: 0 0 8px rgba(254, 231, 21, 0.7);
-        }
-        .form-input {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #f0f0f0;
-        }
-        .form-input::placeholder {
-            color: #a0a0a0;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: var(--vivid-yellow);
-            box-shadow: 0 0 0 2px var(--vivid-yellow);
-        }
-        .results-card {
-            background-color: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+        --card: 222.2 84% 4.9%;
+        --card-foreground: 210 40% 98%;
+        --popover: 222.2 84% 4.9%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 210 40% 98%;
+        --primary-foreground: 222.2 47.4% 11.2%;
+        --secondary: 217.2 32.6% 17.5%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 217.2 32.6% 17.5%;
+        --muted-foreground: 215 20.2% 65.1%;
+        --accent: 217.2 32.6% 17.5%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 17.5%;
+        --ring: 212.7 26.8% 83.9%;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+      }
+      .spinner { border-top-color: hsl(var(--primary)); animation: spin 1s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .table-cell {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid hsl(var(--border));
+        font-size: 0.875rem;
+      }
+      
+      .card {
+        background-color: hsl(var(--card));
+        color: hsl(var(--card-foreground));
+        border-radius: var(--radius);
+        border: 1px solid hsl(var(--border));
+      }
+      .card-header { padding: 1.5rem; }
+      .card-title { font-size: 1.25rem; font-weight: 600; }
+      .card-description { color: hsl(var(--muted-foreground)); }
+      .card-content { padding: 1.5rem; }
+      .card-footer { padding: 1.5rem; }
+      
+      .input {
+        background-color: hsl(var(--background));
+        border: 1px solid hsl(var(--input));
+        border-radius: var(--radius);
+        padding: 0.5rem 0.75rem;
+        width: 100%;
+        height: 2.5rem;
+      }
+      .input:focus-visible {
+        outline: 2px solid hsl(var(--ring));
+        outline-offset: 2px;
+      }
+      .btn {
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius);
+        text-align: center;
+        font-weight: 500;
+        height: 2.5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn:hover {
+        opacity: 0.9;
+      }
     </style>
 </head>
-<body class="text-gray-200 flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen py-12">
 
-    <div class="w-full max-w-4xl mx-auto">
-        <div class="bg-transparent rounded-2xl main-container p-8">
-            
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <!-- Left Column: Form -->
-                <div>
-                    <div class="text-left mb-8">
-                        <h1 class="text-4xl font-extrabold text-white">SentimenKopi.com</h1>
-                        <p class="text-gray-400 mt-2">Analisis Ulasan Kedai Kopi Anda dengan AI</p>
-                    </div>
+    <div class="w-full max-w-3xl mx-auto p-4 md:p-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold">Sentimen Kopi</h1>
+            <button id="theme-toggle" class="p-2 rounded-md border" style="border-color: hsl(var(--border));">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun block dark:hidden"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon hidden dark:block"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+        </div>
+        <div style="background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); border-radius: var(--radius); border: 1px solid hsl(var(--border));">
 
-                    <!-- Upload Form -->
+            <!-- Upload Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Analisis Sentimen</h2>
+                    <p class="card-description">Unggah file CSV Anda dan masukkan nama kolom teks untuk memulai.</p>
+                </div>
+                <div class="card-content">
                     <form id="upload-form" class="space-y-6">
                         <div>
-                            <label for="file-upload" class="block text-sm font-medium text-gray-300 mb-2">Langkah 1: Unggah File CSV</label>
-                            <div id="file-drop-area" class="flex justify-center items-center w-full px-6 py-10 border-2 border-dashed border-gray-600 rounded-md hover:border-vivid-yellow transition-colors duration-300">
+                            <label for="file-upload" class="block text-sm font-medium mb-2">Langkah 1: Unggah File CSV Anda</label>
+                            <div id="file-drop-area" class="flex justify-center items-center w-full px-6 pt-5 pb-6 border-2 border-dashed rounded-md" style="border-color: hsl(var(--border));">
                                 <div class="space-y-1 text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                                    <div class="flex text-sm text-gray-400"><label for="file-upload" class="relative cursor-pointer rounded-md font-medium text-vivid-yellow hover:text-yellow-300"><span>Pilih file</span><input id="file-upload" name="file" type="file" class="sr-only" accept=".csv"></label><p class="pl-1">atau seret dan lepas</p></div>
-                                    <p id="file-name" class="text-xs text-gray-500">CSV hingga 10MB</p>
+                                    <svg class="mx-auto h-12 w-12" style="color: hsl(var(--muted-foreground));" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                    <div class="flex text-sm" style="color: hsl(var(--muted-foreground));"><label for="file-upload" class="relative cursor-pointer rounded-md font-medium" style="color: hsl(var(--primary));"><span>Pilih file</span><input id="file-upload" name="file" type="file" class="sr-only" accept=".csv"></label><p class="pl-1">atau seret dan lepas</p></div>
+                                    <p id="file-name" class="text-xs" style="color: hsl(var(--muted-foreground));">CSV hingga 10MB</p>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label for="text-column" class="block text-sm font-medium text-gray-300">Langkah 2: Nama Kolom Teks</label>
-                            <input type="text" id="text-column" class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm form-input" placeholder="Contoh: Text, review, ulasan">
+                            <label for="text-column" class="block text-sm font-medium">Langkah 2: Masukkan Nama Kolom Teks</label>
+                            <input type="text" name="text_column" id="text-column" class="input mt-1" placeholder="Contoh: Text, review, ulasan">
                         </div>
-                        <button type="submit" id="submit-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-rich-black bg-vivid-yellow hover:bg-yellow-300 disabled:bg-yellow-700 transition-colors duration-300">
+                        <button type="submit" id="submit-button" class="btn w-full">
                             <span id="button-text">Analisis & Beri Wawasan</span>
-                            <div id="spinner" class="spinner h-5 w-5 rounded-full border-2 border-t-2 border-rich-black hidden"></div>
+                            <div id="spinner" class="spinner h-5 w-5 rounded-full border-2 border-t-2 hidden" style="border-color: hsl(var(--primary-foreground)); border-top-color: transparent;"></div>
                         </button>
                     </form>
-                    <div id="error-message" class="mt-4 text-center text-sm text-red-400 font-medium hidden"></div>
+                </div>
+                <div class="card-footer">
+                    <div id="error-message" class="text-sm font-medium text-red-600 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-area" class="mt-12 hidden space-y-8">
+                <!-- Data Preview -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Pratinjau Hasil</h2>
+                        <p class="card-description">Menampilkan 10 baris pertama dari data yang telah dianalisis.</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead id="preview-table-head" class="border-b" style="border-color: hsl(var(--border));"></thead>
+                                <tbody id="preview-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Right Column: Results -->
-                <div id="results-area" class="mt-10 md:mt-0 hidden">
-                    <div class="text-center mb-6">
-                        <h2 class="text-2xl font-bold text-white yellow-glow">✨ Wawasan Berbasis AI</h2>
-                        <p class="text-gray-400">Ringkasan dan saran oleh Gemini.</p>
+                <!-- Visualizations -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Visualisasi Data</h2>
                     </div>
-                    <div class="space-y-6">
-                        <div class="p-6 rounded-lg results-card"><h3 class="text-lg font-semibold text-vivid-yellow mb-3">Ringkasan Ulasan</h3><div id="summary-content" class="text-gray-300 text-sm"></div></div>
-                        <div class="p-6 rounded-lg results-card"><h3 class="text-lg font-semibold text-vivid-yellow mb-3">Saran Perbaikan</h3><div id="suggestions-content" class="text-gray-300 text-sm"></div></div>
+                    <div class="card-content grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        <div class="lg:col-span-2 card p-6"><h3 class="text-lg font-semibold mb-3">Proporsi Sentimen</h3><canvas id="sentiment-chart"></canvas></div>
+                        <div class="lg:col-span-3 card p-6"><h3 class="text-lg font-semibold mb-3">Word Cloud</h3><img id="wordcloud-image" class="w-full h-auto rounded" alt="Word Cloud of Reviews"></div>
                     </div>
-                     <div class="text-center mt-8">
-                        <button id="download-button" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">Unduh CSV Hasil Analisis</button>
+                </div>
+
+                <!-- Gemini Insights -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Wawasan Berbasis AI</h2>
+                        <p class="card-description">Ringkasan dan saran yang dihasilkan oleh Gemini.</p>
                     </div>
+                    <div class="card-content grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="card p-6"><h3 class="text-lg font-semibold mb-3">Ringkasan Ulasan</h3><div id="summary-content" class="text-sm" style="color: hsl(var(--muted-foreground));"></div></div>
+                        <div class="card p-6"><h3 class="text-lg font-semibold mb-3">Saran Perbaikan</h3><div id="suggestions-content" class="text-sm" style="color: hsl(var(--muted-foreground));"></div></div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8">
+                    <button id="download-button" class="btn">Unduh CSV Hasil Lengkap</button>
                 </div>
             </div>
         </div>
@@ -125,6 +220,12 @@
             const suggestionsContent = document.getElementById('suggestions-content');
             const downloadButton = document.getElementById('download-button');
             
+            const previewTableHead = document.getElementById('preview-table-head');
+            const previewTableBody = document.getElementById('preview-table-body');
+            const wordcloudImage = document.getElementById('wordcloud-image');
+            const chartCanvas = document.getElementById('sentiment-chart');
+            let sentimentChart = null;
+
             let csvResultData = null;
 
             // Drag and Drop
@@ -132,10 +233,10 @@
                 fileDropArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); });
             });
             ['dragenter', 'dragover'].forEach(eventName => {
-                fileDropArea.addEventListener(eventName, () => fileDropArea.classList.add('border-yellow-400'));
+                fileDropArea.addEventListener(eventName, () => fileDropArea.style.borderColor = 'hsl(var(--primary))');
             });
             ['dragleave', 'drop'].forEach(eventName => {
-                fileDropArea.addEventListener(eventName, () => fileDropArea.classList.remove('border-yellow-400'));
+                fileDropArea.addEventListener(eventName, () => fileDropArea.style.borderColor = 'hsl(var(--border))');
             });
             fileDropArea.addEventListener('drop', e => {
                 const files = e.dataTransfer.files;
@@ -165,7 +266,7 @@
                 resultsArea.classList.add('hidden');
 
                 try {
-                    const response = await fetch(`http://127.0.0.1:8000/process_and_suggest?text_column=${encodeURIComponent(textColumn)}`, {
+                    const response = await fetch(`/process_and_suggest?text_column=${encodeURIComponent(textColumn)}`, {
                         method: 'POST',
                         body: formData,
                     });
@@ -176,11 +277,7 @@
                     }
 
                     const results = await response.json();
-                    
-                    summaryContent.innerHTML = results.summary.replace(/\n/g, '<br>');
-                    suggestionsContent.innerHTML = results.suggestions.replace(/\n/g, '<br>');
-                    csvResultData = results.csv_data;
-                    resultsArea.classList.remove('hidden');
+                    displayResults(results);
 
                 } catch (error) {
                     showError(error.message);
@@ -188,6 +285,88 @@
                     setLoading(false);
                 }
             });
+
+            function displayResults(results) {
+                summaryContent.innerHTML = results.summary.replace(/\n/g, '<br>');
+                suggestionsContent.innerHTML = results.suggestions.replace(/\n/g, '<br>');
+                csvResultData = results.csv_data;
+
+                if (results.wordcloud_image) {
+                    wordcloudImage.src = `data:image/png;base64,${results.wordcloud_image}`;
+                }
+
+                renderPreviewTable(results.preview_data);
+                renderSentimentChart(results.sentiment_counts);
+                
+                resultsArea.classList.remove('hidden');
+            }
+
+            function renderPreviewTable(data) {
+                previewTableHead.innerHTML = '';
+                previewTableBody.innerHTML = '';
+                if (!data || data.length === 0) return;
+
+                const headers = Object.keys(data[0]);
+                const headerRow = document.createElement('tr');
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.className = 'table-cell text-left font-semibold';
+                    th.style.color = 'hsl(var(--muted-foreground))';
+                    th.textContent = header;
+                    headerRow.appendChild(th);
+                });
+                previewTableHead.appendChild(headerRow);
+
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    headers.forEach(header => {
+                        const td = document.createElement('td');
+                        td.className = 'table-cell';
+                        td.textContent = row[header];
+                        tr.appendChild(td);
+                    });
+                    previewTableBody.appendChild(tr);
+                });
+            }
+
+            function renderSentimentChart(counts) {
+                if (sentimentChart) {
+                    sentimentChart.destroy();
+                }
+                const labels = Object.keys(counts);
+                const data = Object.values(counts);
+                
+                const chartData = {
+                    labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+                    datasets: [{
+                        label: 'Jumlah Sentimen',
+                        data: data,
+                        backgroundColor: [],
+                        borderColor: 'hsl(var(--card))',
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                };
+                const colorMap = {'positive': '#22c55e', 'negative': '#ef4444', 'neutral': '#f59e0b'};
+                chartData.datasets[0].backgroundColor = chartData.labels.map(label => colorMap[label.toLowerCase()]);
+
+                Chart.defaults.color = 'hsl(var(--muted-foreground))';
+                sentimentChart = new Chart(chartCanvas, {
+                    type: 'pie',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { 
+                                position: 'top',
+                                labels: {
+                                    color: 'hsl(var(--foreground))'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
 
             downloadButton.addEventListener('click', () => {
                 if (!csvResultData) return;
@@ -214,6 +393,15 @@
             }
             function hideError() {
                 errorMessage.classList.add('hidden');
+            }
+
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
             }
         });
     </script>
