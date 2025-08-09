@@ -118,6 +118,3 @@ dmypy.json
 .pyre/
 
 key/
-models/*.h5
-models/*.pkl
-models/*.keras
