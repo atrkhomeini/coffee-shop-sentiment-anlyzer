@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- Project Details ---
-GCP_PROJECT_ID = "coffee-shop-467807" 
+GCP_PROJECT_ID = "sentimen-kopi-com" 
 BIGQUERY_DATASET = "coffee_shop_sentiment"
 BIGQUERY_TRAINING_TABLE = "labelled" 
 
