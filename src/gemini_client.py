@@ -23,23 +23,38 @@ def generate_insights(positive_reviews, negative_reviews):
     if not positive_reviews and not negative_reviews:
         return "Tidak ada ulasan untuk dianalisis.", "Tidak ada ulasan negatif untuk memberikan saran."
 
+    # --- UPDATED: New, more sophisticated "Expert Analyst" prompt ---
     prompt = f"""
-    You are a business consultant for a coffee shop in Indonesia.
-    Analyze the following customer reviews.
+    You are an expert market analyst and business consultant specializing in the Food & Beverage industry in Indonesia, with a focus on coffee shops. Your goal is to provide the coffee shop owner with deep, actionable insights that can directly improve their business.
+
+    Analyze the following customer reviews provided.
 
     **Positive Reviews:**
-    - {"- ".join(positive_reviews[:15]) if positive_reviews else "N/A"} 
+    - {"- ".join(positive_reviews[:20]) if positive_reviews else "N/A"} 
 
     **Negative Reviews:**
-    - {"- ".join(negative_reviews[:15]) if negative_reviews else "N/A"}
+    - {"- ".join(negative_reviews[:20]) if negative_reviews else "N/A"}
 
-    Based on the reviews, provide the following in two distinct sections:
+    Based on this data, generate a concise business report in Bahasa Indonesia with two distinct sections:
 
-    **Section 1: Ringkasan Ulasan (Review Summary)**
-    Summarize the main positive themes and the main negative themes in Bahasa Indonesia.
+    ---
 
-    **Section 2: Saran Perbaikan (Actionable Suggestions)**
-    Based ONLY on the negative reviews, provide 3-4 concrete, actionable suggestions.
+    **Section 1: Ringkasan Ulasan & Analisis Tema**
+    1.  **Analisis Tema Positif:** Identify the top 2-3 specific things customers love. Categorize each theme (e.g., Produk, Pelayanan, Suasana, Harga). For example: "Produk - Kopi Gula Aren sangat disukai karena rasanya yang konsisten."
+    2.  **Analisis Tema Negatif:** Identify the top 2-3 specific things customers complain about. Categorize each theme clearly. For example: "Pelayanan - Waktu tunggu pesanan yang lama menjadi keluhan utama."
+
+    ---
+
+    **Section 2: Saran Perbaikan Prioritas**
+    Based ONLY on the negative themes, provide the top 3 most impactful and actionable recommendations for the business owner. For each recommendation, provide a brief "Rationale" (Mengapa ini penting) explaining the business benefit. Present this as a numbered list.
+
+    Example Format for Recommendations:
+    1.  **Tingkatkan Kecepatan Pelayanan:** Latih barista untuk meracik pesanan populer dengan lebih efisien.
+        * **Mengapa ini penting:** Mengurangi waktu tunggu akan meningkatkan kepuasan pelanggan dan mempercepat perputaran meja, yang berpotensi meningkatkan pendapatan.
+    2.  **[Rekomendasi Berikutnya]**
+        * **Mengapa ini penting:** [Penjelasan]
+
+    ---
     """
 
     # Using exponential backoff for retries
