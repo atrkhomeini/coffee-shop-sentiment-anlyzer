@@ -37,9 +37,11 @@ jobs:
     - name: Configure Docker
       run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-    # --- UPDATED: Tag with the unique Git commit SHA instead of 'latest' ---
+    # --- UPDATED: Add --no-cache flag to force a completely fresh build ---
     - name: Build Docker image
-      run: docker build --no-cache -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+      run: >
+        docker build --no-cache 
+        -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
 
     - name: Push Docker image
       run: docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
@@ -49,7 +51,6 @@ jobs:
       with:
         service: ${{ env.SERVICE_NAME }}
         region: ${{ env.REGION }}
-        # --- UPDATED: Deploy the new, uniquely tagged image ---
         image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
         env_vars: |
           GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
