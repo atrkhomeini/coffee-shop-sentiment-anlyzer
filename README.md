@@ -133,3 +133,4 @@ Navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
 - Real-time analytics dashboard to visualize sentiment trends.
 - Automated CI/CD pipeline for model retraining and deployment.
+- Improve UI Style
