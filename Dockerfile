@@ -8,22 +8,18 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
-# Use --no-cache-dir to reduce image size
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application's code into the container
-# This includes the 'app', 'src', and 'models' directories
+# Copy the application's code and resources
 COPY ./app /app/app
 COPY ./src /app/src
-COPY ./models /app/models
 
-# NOTE: We DO NOT copy the key/gemini_api_key.yml file.
-# The API key will be injected as an environment variable during deployment.
-# This makes the image secure and portable.
+# --- THIS IS THE CRUCIAL LINE ---
+# It copies your trained model and tokenizer into the image.
+COPY ./models /app/models
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
 # Command to run the application
-# The src/config.py file will automatically pick up the GEMINI_API_KEY env variable.
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
