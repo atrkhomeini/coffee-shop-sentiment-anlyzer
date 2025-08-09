@@ -11,6 +11,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from wordcloud import WordCloud
+import base64
 
 # --- Project Imports ---
 import sys
@@ -51,6 +53,22 @@ def load_ml_components():
         print("✅ Model, tokenizer, and cleaner loaded successfully.")
     except Exception as e:
         print(f"❌ FATAL ERROR: Could not load ML components on startup: {e}")
+
+# --- Helper Function for Word Cloud ---
+def create_wordcloud(text_series):
+    """Generates a word cloud image from a series of text."""
+    full_text = ' '.join(text_series.dropna())
+    if not full_text:
+        return None
+    
+    # Generate word cloud with a white background for good contrast
+    wordcloud = WordCloud(width=800, height=400, background_color='white', colormap='viridis').generate(full_text)
+    
+    img_buffer = io.BytesIO()
+    wordcloud.to_image().save(img_buffer, format='PNG')
+    img_bytes = img_buffer.getvalue()
+    
+    return base64.b64encode(img_bytes).decode('utf-8')
 
 # --- API Endpoints ---
 @app.get("/", response_class=HTMLResponse)
@@ -93,13 +111,21 @@ async def process_and_suggest(
         negative_reviews = df_processed[df_processed['sentiment'] == 'negative'][text_column].dropna().tolist()
         summary, suggestions = generate_insights(positive_reviews, negative_reviews)
         
+        # --- Prepare Data for Frontend ---
         output_df = df_processed.drop(columns=['cleaned_text'])
+        
+        preview_data = output_df.head(10).to_dict(orient='records')
+        sentiment_counts = output_df['sentiment'].value_counts().to_dict()
+        wordcloud_image_base64 = create_wordcloud(df_processed['cleaned_text'])
         csv_data = output_df.to_csv(index=False)
 
         return JSONResponse(content={
             "summary": summary,
             "suggestions": suggestions,
-            "csv_data": csv_data
+            "csv_data": csv_data,
+            "preview_data": preview_data,
+            "sentiment_counts": sentiment_counts,
+            "wordcloud_image": wordcloud_image_base64
         })
 
     except Exception as e:
