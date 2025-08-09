@@ -7,7 +7,7 @@ on:
     branches: [ "master" ] # Trigger the workflow on push to the master branch
 
 env:
-  PROJECT_ID: coffee-shop-467807
+  PROJECT_ID: sentimen-kopi-com
   REGION: asia-southeast2
   SERVICE_NAME: sentimenkopi-com-prod
   REPO_NAME: sentimenkopi-repo
