@@ -62,7 +62,7 @@
       .spinner { border-top-color: hsl(var(--primary)); animation: spin 1s linear infinite; }
       @keyframes spin { to { transform: rotate(360deg); } }
       .table-cell { @apply px-4 py-2 border-b text-sm; border-color: hsl(var(--border)); }
-
+      
       .card {
         background-color: hsl(var(--card));
         color: hsl(var(--card-foreground));
@@ -74,7 +74,7 @@
       .card-description { color: hsl(var(--muted-foreground)); }
       .card-content { padding: 1.5rem; }
       .card-footer { padding: 1.5rem; }
-
+      
       .input {
         background-color: hsl(var(--background));
         border: 1px solid hsl(var(--input));
@@ -118,7 +118,7 @@
         <div class="container mx-auto px-4 text-center">
             <h1 class="text-4xl font-bold mb-4">Analisis Sentimen Ulasan Kedai Kopi</h1>
             <p class="text-lg" style="color: hsl(var(--muted-foreground));">
-                Unggah ulasan pelanggan Anda dan dapatkan wawasan berharga tentang sentimen mereka.
+                Unggah ulasan pelanggan Anda dan dapatkan wawasan berharga tentang sentimen mereka. 
                 <br>
                 Pahami apa yang disukai dan tidak disukai pelanggan tentang kedai kopi Anda.
             </p>
@@ -215,8 +215,6 @@
         const suggestionsContent = document.getElementById('suggestions-content');
         const downloadButton = document.getElementById('download-button');
         
-        const previewTableHead = document.getElementById('preview-table-head');
-        const previewTableBody = document.getElementById('preview-table-body');
         const wordcloudImage = document.getElementById('wordcloud-image');
         const chartCanvas = document.getElementById('sentiment-chart');
         let sentimentChart = null;
@@ -294,8 +292,6 @@
                 wordcloudImage.src = `data:image/png;base64,${results.wordcloud_image}`;
             }
 
-            // Data Preview Table
-            renderPreviewTable(results.preview_data);
 
             // Sentiment Pie Chart
             renderSentimentChart(results.sentiment_counts);
@@ -303,32 +299,6 @@
             resultsArea.classList.remove('hidden');
         }
 
-        function renderPreviewTable(data) {
-            previewTableHead.innerHTML = '';
-            previewTableBody.innerHTML = '';
-            if (!data || data.length === 0) return;
-
-            const headers = Object.keys(data[0]);
-            const headerRow = document.createElement('tr');
-            headers.forEach(header => {
-                const th = document.createElement('th');
-                th.className = 'table-cell text-left font-semibold text-gray-600 bg-gray-100';
-                th.textContent = header;
-                headerRow.appendChild(th);
-            });
-            previewTableHead.appendChild(headerRow);
-
-            data.forEach(row => {
-                const tr = document.createElement('tr');
-                headers.forEach(header => {
-                    const td = document.createElement('td');
-                    td.className = 'table-cell';
-                    td.textContent = row[header];
-                    tr.appendChild(td);
-                });
-                previewTableBody.appendChild(tr);
-            });
-        }
 
         function renderSentimentChart(counts) {
             if (sentimentChart) {
