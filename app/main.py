@@ -5,8 +5,8 @@ import pandas as pd
 from pandas.errors import ParserError
 import numpy as np
 from pathlib import Path
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from tensorflow.keras.models import load_model
@@ -61,7 +61,6 @@ def create_wordcloud(text_series):
     if not full_text:
         return None
     
-    # Generate word cloud with a white background for good contrast
     wordcloud = WordCloud(width=800, height=400, background_color='white', colormap='viridis').generate(full_text)
     
     img_buffer = io.BytesIO()
@@ -71,21 +70,30 @@ def create_wordcloud(text_series):
     return base64.b64encode(img_bytes).decode('utf-8')
 
 # --- API Endpoints ---
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/", response_class=RedirectResponse)
+async def read_root():
+    return RedirectResponse(url="/home")
 
-@app.post("/process_and_suggest")
+@app.get("/home", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.post("/process_and_suggest", response_class=HTMLResponse)
 async def process_and_suggest(
+    request: Request,
     file: UploadFile = File(...),
-    text_column: str = Query(...)
+    text_column: str = Form(...)
 ):
     if not all([model, tokenizer, cleaner]):
         raise HTTPException(status_code=503, detail="ML components are not available.")
 
     try:
         contents = await file.read()
-        decoded_contents = contents.decode('utf-8')
+        try:
+            decoded_contents = contents.decode('utf-8')
+        except UnicodeDecodeError:
+            decoded_contents = contents.decode('latin-1') # Fallback for different encoding
+
         try:
             df = pd.read_csv(io.StringIO(decoded_contents))
         except ParserError:
@@ -114,19 +122,30 @@ async def process_and_suggest(
         # --- Prepare Data for Frontend ---
         output_df = df_processed.drop(columns=['cleaned_text'])
         
-        preview_data = output_df.head(10).to_dict(orient='records')
         sentiment_counts = output_df['sentiment'].value_counts().to_dict()
         wordcloud_image_base64 = create_wordcloud(df_processed['cleaned_text'])
         csv_data = output_df.to_csv(index=False)
 
-        return JSONResponse(content={
-            "summary": summary,
-            "suggestions": suggestions,
+        # Replace newlines for HTML rendering
+        summary_html = summary.replace("\n", "<br>")
+        suggestions_html = suggestions.replace("\n", "<br>")
+
+        return templates.TemplateResponse("result.html", {
+            "request": request,
+            "summary": summary_html,
+            "suggestions": suggestions_html,
             "csv_data": csv_data,
-            "preview_data": preview_data,
             "sentiment_counts": sentiment_counts,
-            "wordcloud_image": wordcloud_image_base64
+            "wordcloud_image": wordcloud_image_base64,
+            "filename": file.filename
         })
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred during processing: {str(e)}")
+        # If an error occurs, it's better to show an informative error page
+        return templates.TemplateResponse("error.html", {"request": request, "detail": str(e)}, status_code=500)
+
+@app.get("/result")
+async def result_page_not_accessible(request: Request):
+    # This is just a placeholder to avoid 404 if user tries to access /result directly
+    # Redirecting to home is a good practice
+    return RedirectResponse(url="/home")
