@@ -9,3 +9,4 @@ google-generativeai
 db-dtypes
 Jinja2
 wordcloud
+markdown2

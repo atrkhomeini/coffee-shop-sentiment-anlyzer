@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SentimenKopi.com - Sentiment Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
@@ -61,7 +59,6 @@
       }
       .spinner { border-top-color: hsl(var(--primary)); animation: spin 1s linear infinite; }
       @keyframes spin { to { transform: rotate(360deg); } }
-      .table-cell { @apply px-4 py-2 border-b text-sm; border-color: hsl(var(--border)); }
       
       .card {
         background-color: hsl(var(--card));
@@ -134,7 +131,7 @@
                     <p class="card-description">Unggah file CSV Anda dan masukkan nama kolom teks untuk memulai.</p>
                 </div>
                 <div class="card-content">
-                    <form id="upload-form" class="space-y-6">
+                    <form id="upload-form" action="/process_and_suggest" method="post" enctype="multipart/form-data" class="space-y-6">
                         <div>
                             <label for="file-upload" class="block text-sm font-medium mb-2">Langkah 1: Unggah File CSV Anda</label>
                             <div id="file-drop-area" class="flex justify-center items-center w-full px-6 pt-5 pb-6 border-2 border-dashed rounded-md" style="border-color: hsl(var(--border));">
@@ -153,7 +150,7 @@
                         </div>
                         <div>
                             <label for="text-column" class="block text-sm font-medium">Langkah 2: Masukkan Nama Kolom Teks</label>
-                            <input type="text" name="text_column" id="text-column" class="input mt-1" placeholder="Contoh: Text, review, ulasan">
+                            <input type="text" name="text_column" id="text-column" class="input mt-1" placeholder="Contoh: Text, review, ulasan" required>
                         </div>
                         <button type="submit" id="submit-button" class="btn w-full">
                             <span id="button-text">Analisis & Beri Wawasan</span>
@@ -165,61 +162,18 @@
                     <div id="error-message" class="text-sm font-medium text-red-600 hidden"></div>
                 </div>
             </div>
-
-            <!-- Results Section -->
-            <div id="results-area" class="mt-12 hidden space-y-8">
-
-                <!-- Visualizations -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Visualisasi Data</h2>
-                    </div>
-                    <div class="card-content grid grid-cols-1 gap-6">
-                        <div class="card p-6"><h3 class="text-lg font-semibold mb-3">Proporsi Sentimen</h3><canvas id="sentiment-chart"></canvas></div>
-                        <div class="card p-6"><h3 class="text-lg font-semibold mb-3">Word Cloud</h3><img id="wordcloud-image" class="w-full h-auto rounded" alt="Word Cloud of Reviews"></div>
-                    </div>
-                </div>
-
-                <!-- Gemini Insights -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Wawasan Berbasis AI</h2>
-                        <p class="card-description">Ringkasan dan saran yang dihasilkan oleh Gemini.</p>
-                    </div>
-                    <div class="card-content grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="card p-6"><h3 class="text-lg font-semibold mb-3">Ringkasan Ulasan</h3><div id="summary-content" class="text-sm" style="color: hsl(var(--muted-foreground));"></div></div>
-                        <div class="card p-6"><h3 class="text-lg font-semibold mb-3">Saran Perbaikan</h3><div id="suggestions-content" class="text-sm" style="color: hsl(var(--muted-foreground));"></div></div>
-                    </div>
-                </div>
-
-                <div class="text-center mt-8">
-                    <button id="download-button" class="btn">Unduh CSV Hasil Lengkap</button>
-                </div>
-            </div>
         </div>
         <footer class="text-center mt-6 text-sm text-gray-500"><p>Dibuat dengan MLOps | Model: CNN-BiLSTM & Google Gemini</p></footer>
-    </div>
+    </main>
 
     <script>
         const form = document.getElementById('upload-form');
         const submitButton = document.getElementById('submit-button');
         const buttonText = document.getElementById('button-text');
         const spinner = document.getElementById('spinner');
-        const errorMessage = document.getElementById('error-message');
         const fileUpload = document.getElementById('file-upload');
         const fileDropArea = document.getElementById('file-drop-area');
         const fileNameDisplay = document.getElementById('file-name');
-
-        const resultsArea = document.getElementById('results-area');
-        const summaryContent = document.getElementById('summary-content');
-        const suggestionsContent = document.getElementById('suggestions-content');
-        const downloadButton = document.getElementById('download-button');
-        
-        const wordcloudImage = document.getElementById('wordcloud-image');
-        const chartCanvas = document.getElementById('sentiment-chart');
-        let sentimentChart = null;
-
-        let csvResultData = null;
 
         // Drag and Drop
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -242,148 +196,17 @@
              if (fileUpload.files.length > 0) fileNameDisplay.textContent = fileUpload.files[0].name;
         });
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData();
-            const file = fileUpload.files[0];
-            const textColumn = document.getElementById('text-column').value;
-
-            if (!file || !textColumn) {
-                showError('Silakan unggah file dan tentukan nama kolom teks.');
-                return;
-            }
-            formData.append('file', file);
-            
-            setLoading(true);
-            hideError();
-            resultsArea.classList.add('hidden');
-
-            try {
-                const response = await fetch(`/process_and_suggest?text_column=${encodeURIComponent(textColumn)}`, {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Terjadi kesalahan pada server.');
-                }
-
-                const results = await response.json();
-                displayResults(results);
-
-            } catch (error) {
-                showError(error.message);
-            } finally {
-                setLoading(false);
-            }
+        form.addEventListener('submit', () => {
+            submitButton.disabled = true;
+            spinner.classList.remove('hidden');
+            buttonText.classList.add('hidden');
         });
-
-        function displayResults(results) {
-            // Gemini Insights
-            summaryContent.innerHTML = results.summary.replace(/\n/g, '<br>');
-            suggestionsContent.innerHTML = results.suggestions.replace(/\n/g, '<br>');
-
-            // Store CSV for download
-            csvResultData = results.csv_data;
-
-            // Word Cloud
-            if (results.wordcloud_image) {
-                wordcloudImage.src = `data:image/png;base64,${results.wordcloud_image}`;
-            }
-
-
-            // Sentiment Pie Chart
-            renderSentimentChart(results.sentiment_counts);
-            
-            resultsArea.classList.remove('hidden');
-        }
-
-
-        function renderSentimentChart(counts) {
-            if (sentimentChart) {
-                sentimentChart.destroy();
-            }
-            const labels = Object.keys(counts);
-            const data = Object.values(counts);
-            const isDarkMode = document.documentElement.classList.contains('dark');
-            const textColor = isDarkMode ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))';
-
-            sentimentChart = new Chart(chartCanvas, {
-                type: 'pie',
-                plugins: [ChartDataLabels],
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Jumlah Sentimen',
-                        data: data,
-                        backgroundColor: [
-                            '#10B981', // Positive - Green
-                            '#F59E0B', // Neutral - Amber
-                            '#EF4444', // Negative - Red
-                        ],
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                color: textColor
-                            }
-                        },
-                        datalabels: {
-                            formatter: (value, ctx) => {
-                                let sum = 0;
-                                let dataArr = ctx.chart.data.datasets[0].data;
-                                dataArr.map(data => {
-                                    sum += data;
-                                });
-                                let percentage = (value*100 / sum).toFixed(2)+"%";
-                                return percentage;
-                            },
-                            color: '#fff',
-                        }
-                    }
-                }
-            });
-        }
-
-        downloadButton.addEventListener('click', () => {
-            if (!csvResultData) return;
-            const blob = new Blob([csvResultData], { type: 'text/csv;charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const originalFilename = fileUpload.files[0].name.replace(/\.csv$/, '');
-            a.download = `${originalFilename}_sentimen.csv`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        });
-
-        function setLoading(isLoading) {
-            submitButton.disabled = isLoading;
-            spinner.classList.toggle('hidden', !isLoading);
-            buttonText.classList.toggle('hidden', isLoading);
-        }
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-        }
-        function hideError() {
-            errorMessage.classList.add('hidden');
-        }
 
         const themeToggle = document.getElementById('theme-toggle');
         themeToggle.addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
         });
 
-        // Set initial theme based on user preference
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
         }
