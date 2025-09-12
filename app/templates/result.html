@@ -84,6 +84,30 @@
       .btn:hover {
         opacity: 0.9;
       }
+
+      /* Styles for Markdown content */
+      .prose {
+        color: hsl(var(--muted-foreground));
+        line-height: 1.75;
+      }
+      .prose h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: hsl(var(--card-foreground));
+        margin-bottom: 1rem;
+      }
+      .prose ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin-top: 0.5rem;
+      }
+      .prose li {
+        margin-bottom: 0.5rem;
+      }
+      .prose strong {
+        font-weight: 600;
+        color: hsl(var(--card-foreground));
+      }
     </style>
 </head>
 <body class="min-h-screen">
@@ -116,8 +140,14 @@
                     <p class="card-description">Ringkasan dan saran yang dihasilkan oleh Gemini.</p>
                 </div>
                 <div class="card-content grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="card p-6"><h3 class="text-lg font-semibold mb-3">Ringkasan Ulasan</h3><div class="text-sm" style="color: hsl(var(--muted-foreground));">{{ summary | safe }}</div></div>
-                    <div class="card p-6"><h3 class="text-lg font-semibold mb-3">Saran Perbaikan</h3><div class="text-sm" style="color: hsl(var(--muted-foreground));">{{ suggestions | safe }}</div></div>
+                    <div class="card p-6">
+                        <h3 class="text-lg font-semibold mb-3">Ringkasan Ulasan</h3>
+                        <div class="prose text-sm">{{ summary | safe }}</div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-lg font-semibold mb-3">Saran Perbaikan</h3>
+                        <div class="prose text-sm">{{ suggestions | safe }}</div>
+                    </div>
                 </div>
             </div>
 

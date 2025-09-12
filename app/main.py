@@ -13,6 +13,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from wordcloud import WordCloud
 import base64
+import markdown2
 
 # --- Project Imports ---
 import sys
@@ -92,7 +93,7 @@ async def process_and_suggest(
         try:
             decoded_contents = contents.decode('utf-8')
         except UnicodeDecodeError:
-            decoded_contents = contents.decode('latin-1') # Fallback for different encoding
+            decoded_contents = contents.decode('latin-1')
 
         try:
             df = pd.read_csv(io.StringIO(decoded_contents))
@@ -126,9 +127,9 @@ async def process_and_suggest(
         wordcloud_image_base64 = create_wordcloud(df_processed['cleaned_text'])
         csv_data = output_df.to_csv(index=False)
 
-        # Replace newlines for HTML rendering
-        summary_html = summary.replace("\n", "<br>")
-        suggestions_html = suggestions.replace("\n", "<br>")
+        # Convert Markdown to HTML
+        summary_html = markdown2.markdown(summary)
+        suggestions_html = markdown2.markdown(suggestions)
 
         return templates.TemplateResponse("result.html", {
             "request": request,
@@ -141,11 +142,8 @@ async def process_and_suggest(
         })
 
     except Exception as e:
-        # If an error occurs, it's better to show an informative error page
         return templates.TemplateResponse("error.html", {"request": request, "detail": str(e)}, status_code=500)
 
 @app.get("/result")
 async def result_page_not_accessible(request: Request):
-    # This is just a placeholder to avoid 404 if user tries to access /result directly
-    # Redirecting to home is a good practice
     return RedirectResponse(url="/home")
