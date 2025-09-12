@@ -1,7 +1,8 @@
 # src/gemini_client.py
 import google.generativeai as genai
-from src.config import GEMINI_API_KEY # This will be None if not found
+from src.config import GEMINI_API_KEY
 import time
+import re
 
 # --- Configure the Gemini API ---
 if GEMINI_API_KEY:
@@ -21,7 +22,6 @@ def generate_insights(positive_reviews, negative_reviews):
     if not positive_reviews and not negative_reviews:
         return "Tidak ada ulasan untuk dianalisis.", "Tidak ada ulasan negatif untuk memberikan saran."
 
-    # --- UPDATED: New prompt with Markdown instruction ---
     prompt = f"""
     You are an expert market analyst and business consultant specializing in the Food & Beverage industry in Indonesia, with a focus on coffee shops.
     Your goal is to provide the coffee shop owner with deep, actionable insights that can directly improve their business.
@@ -65,13 +65,29 @@ def generate_insights(positive_reviews, negative_reviews):
             full_text = response.text
             summary_part, suggestions_part = "Gagal mem-parsing respons.", "Gagal mem-parsing respons."
 
-            # Splitting based on the new Markdown headings
-            if "### Saran Perbaikan Prioritas" in full_text:
-                parts = full_text.split("### Saran Perbaikan Prioritas")
-                summary_part = parts[0].replace("### Ringkasan Ulasan & Analisis Tema", "").strip()
+            # Use regex for more robust splitting, ignoring case and handling variations in markdown headings
+            splitter = re.compile(r'#*\s*Saran Perbaikan Prioritas', re.IGNORECASE)
+            parts = splitter.split(full_text)
+
+            if len(parts) > 1:
+                summary_raw = parts[0]
                 suggestions_part = parts[1].strip()
-            elif "### Ringkasan Ulasan & Analisis Tema" in full_text:
-                 summary_part = full_text.replace("### Ringkasan Ulasan & Analisis Tema", "").strip()
+
+                # Clean up the summary part by removing its heading
+                summary_cleaner = re.compile(r'#*\s*Ringkasan Ulasan & Analisis Tema', re.IGNORECASE)
+                summary_part = summary_cleaner.sub('', summary_raw).strip()
+            else:
+                # Fallback if splitting fails
+                summary_cleaner = re.compile(r'#*\s*Ringkasan Ulasan & Analisis Tema', re.IGNORECASE)
+                if summary_cleaner.search(full_text):
+                    summary_part = summary_cleaner.sub('', full_text).strip()
+
+            # Ensure parts are not empty after stripping
+            if not summary_part:
+                 summary_part = "Ringkasan tidak tersedia."
+            if not suggestions_part:
+                 suggestions_part = "Saran tidak tersedia."
+
 
             return summary_part, suggestions_part
         except Exception as e:
